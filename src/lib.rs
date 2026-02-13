@@ -131,4 +131,70 @@ mod tests {
         assert_eq!(collected.len(), 1);
         assert!(collected[0].ends_with("MyManifest.toml"));
     }
+
+    #[test]
+    fn find_with_absolute_input() {
+        let tmp = std::env::temp_dir().join("find_cargo_toml_test_absolute");
+        let _ = fs::create_dir_all(&tmp);
+        let manifest = tmp.join("Cargo.toml");
+        let _ = fs::File::create(&manifest).and_then(|mut f| f.write_all(b"[package]"));
+        let abs = tmp.canonicalize().unwrap();
+        let collected: Vec<_> = find(&abs, None::<PathBuf>, None).collect();
+        let _ = fs::remove_file(manifest);
+        let _ = fs::remove_dir_all(&tmp);
+        assert_eq!(collected.len(), 1);
+        assert!(collected[0].ends_with("Cargo.toml"));
+    }
+
+    #[test]
+    fn find_when_input_is_file_uses_parent_dir() {
+        let tmp = std::env::temp_dir().join("find_cargo_toml_test_file_input");
+        let _ = fs::create_dir_all(&tmp);
+        let manifest = tmp.join("Cargo.toml");
+        let _ = fs::File::create(&manifest).and_then(|mut f| f.write_all(b"[package]"));
+        let some_file = tmp.join("foo.rs");
+        let _ = fs::File::create(&some_file);
+        let collected: Vec<_> = find(&some_file, None::<PathBuf>, None).collect();
+        let _ = fs::remove_file(some_file);
+        let _ = fs::remove_file(manifest);
+        let _ = fs::remove_dir_all(&tmp);
+        assert_eq!(collected.len(), 1);
+        assert!(collected[0].ends_with("Cargo.toml"));
+    }
+
+    #[test]
+    fn find_from_current_dir_delegates_to_find() {
+        let count = find_from_current_dir(".", None).count();
+        assert!(count >= 1, "project root has Cargo.toml");
+    }
+
+    #[test]
+    fn find_with_explicit_base() {
+        let tmp = std::env::temp_dir().join("find_cargo_toml_test_base");
+        let _ = fs::create_dir_all(&tmp);
+        let manifest = tmp.join("Cargo.toml");
+        let _ = fs::File::create(&manifest).and_then(|mut f| f.write_all(b"[package]"));
+        let collected: Vec<_> = find(".", Some(&tmp), None).collect();
+        let _ = fs::remove_file(manifest);
+        let _ = fs::remove_dir_all(&tmp);
+        assert_eq!(collected.len(), 1);
+        assert!(collected[0].ends_with("Cargo.toml"));
+    }
+
+    #[test]
+    fn find_normalizes_path_with_dot_dot() {
+        let tmp = std::env::temp_dir().join("find_cargo_toml_test_normalize");
+        let sub = tmp.join("sub");
+        let _ = fs::create_dir_all(&sub);
+        let manifest = tmp.join("Cargo.toml");
+        let _ = fs::File::create(&manifest).and_then(|mut f| f.write_all(b"[package]"));
+        let input = sub.join("..");
+        let collected: Vec<_> = find(&input, None::<PathBuf>, None).collect();
+        let _ = fs::remove_file(manifest);
+        let _ = fs::remove_dir_all(&tmp);
+        assert!(
+            collected.iter().any(|p| p.parent().map(|d| d == tmp).unwrap_or(false)),
+            "should find Cargo.toml in tmp when input is sub/.."
+        );
+    }
 }

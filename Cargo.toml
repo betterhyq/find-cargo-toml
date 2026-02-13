@@ -1,6 +1,6 @@
 [package]
 name = "find-cargo-toml"
-version = "0.0.1"
+version = "1.0.0"
 authors = ["YONGQI <betterhyq@qq.com>"]
 edition = "2024"
 description = "Find Cargo.toml by walking up the directory tree (Rust port of find-package-json)"
@@ -8,7 +8,7 @@ readme = "README.md"
 homepage = "https://github.com/betterhyq/find-cargo-toml"
 repository = "https://github.com/betterhyq/find-cargo-toml.git"
 license = "MIT"
-keywords = [""]
+keywords = ["cargo", "toml", "find", "package", "json"]
 categories = ["development-tools"]
 
 [dependencies]
