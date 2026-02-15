@@ -1,10 +1,14 @@
-//! Find `Cargo.toml` (or a custom filename) by walking up the directory tree.
+//! Find `Cargo.toml` (or a custom manifest filename) by walking up the directory tree.
+//!
+//! Starts from a given path and yields every directory that contains the manifest file,
+//! from nearest to the root. Useful for locating workspace or package roots in Rust projects.
 //!
 //! Inspired by the npm package [find-package-json](https://www.npmjs.com/package/find-package-json).
 
 use std::path::{Path, PathBuf};
 
-/// Iterator that walks up from a directory and yields each path where the manifest file exists.
+/// Iterator that walks upward from a directory and yields the full path to the manifest file
+/// whenever it exists. Yields paths from the directory nearest to the start path toward the root.
 pub struct FindIter {
     current: Option<PathBuf>,
     file_name: String,
@@ -27,12 +31,20 @@ impl Iterator for FindIter {
     }
 }
 
-/// Find manifest files (default `Cargo.toml`) by walking up from `input`.
+/// Finds manifest files by walking up from `input`. Defaults to `Cargo.toml`.
 ///
-/// * `input` – Path to start searching from (directory or file; if file, its parent is used).
-/// * `base` – Optional base path to resolve `input` against when `input` is relative.
-///   If `None`, uses the current working directory.
-/// * `file_name` – Manifest filename to look for (default: `"Cargo.toml"`).
+/// # Arguments
+///
+/// * **`input`** – Where to start. Can be a directory or a file path; if a file,
+///   its parent directory is used. Relative paths are resolved against `base`.
+/// * **`base`** – Base path for resolving relative `input`. If `None`, the current
+///   working directory is used.
+/// * **`file_name`** – Name of the manifest file to look for. If `None`, `"Cargo.toml"` is used.
+///
+/// # Returns
+///
+/// A [`FindIter`] that yields the full path to each manifest file found, from the directory
+/// closest to the start path upward toward the filesystem root.
 ///
 /// # Example
 ///
@@ -78,7 +90,8 @@ where
     }
 }
 
-/// Same as [`find`], but always starts from the current directory (no base).
+/// Convenience wrapper for [`find`] that uses the current working directory as the base.
+/// Equivalent to `find(input, None::<PathBuf>, file_name)`.
 pub fn find_from_current_dir<P>(input: P, file_name: Option<&str>) -> FindIter
 where
     P: AsRef<Path>,
@@ -86,7 +99,7 @@ where
     find(input, None::<PathBuf>, file_name)
 }
 
-/// Normalize a path by resolving `.` and `..` components.
+/// Resolves `.` and `..` in `path` and returns a normalized [`PathBuf`].
 fn normalize_path(path: &Path) -> PathBuf {
     path.components().collect()
 }
