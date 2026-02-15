@@ -8,11 +8,9 @@
 ![GitHub Repo stars](https://img.shields.io/github/stars/betterhyq/find-cargo-toml)
 <!-- /automdrs -->
 
-`find-cargo-toml` finds `Cargo.toml` by walking up the directory tree from a given path—a Rust port of the npm package [find-package-json](https://www.npmjs.com/package/find-package-json).
+Find `Cargo.toml` (or a custom manifest file) by walking up the directory tree from a given path. Yields manifest paths from nearest to root—handy for locating package or workspace roots. Rust port of [find-package-json](https://www.npmjs.com/package/find-package-json).
 
 ## Installation
-
-Add this crate with Cargo:
 
 <!-- automdrs:cargo-add -->
 
@@ -24,32 +22,42 @@ cargo add find-cargo-toml
 
 ## Usage
 
+**From current directory (default `Cargo.toml`):**
+
 ```rust
 use find_cargo_toml::find;
 use std::path::PathBuf;
 
-// Find all Cargo.toml from current dir upward
 for path in find(".", None::<PathBuf>, None) {
-    println!("Found: {}", path.display());
-}
-
-// Start from a specific path (e.g. a source file)
-for path in find("src/lib.rs", None::<PathBuf>, None) {
-    println!("Manifest: {}", path.display());
-}
-
-// Use a custom manifest filename
-for path in find(".", None::<PathBuf>, Some("MyManifest.toml")) {
-    println!("Found: {}", path.display());
-}
-
-// Resolve relative input against an explicit base
-for path in find(".", Some("/some/base"), None) {
     println!("Found: {}", path.display());
 }
 ```
 
-Convenience function when starting from the current working directory:
+**From a file path** (search starts at the file’s parent):
+
+```rust
+for path in find("src/lib.rs", None::<PathBuf>, None) {
+    println!("Manifest: {}", path.display());
+}
+```
+
+**Custom manifest filename:**
+
+```rust
+for path in find(".", None::<PathBuf>, Some("MyManifest.toml")) {
+    println!("Found: {}", path.display());
+}
+```
+
+**Explicit base for relative `input`:**
+
+```rust
+for path in find(".", Some(PathBuf::from("/some/base")), None) {
+    println!("Found: {}", path.display());
+}
+```
+
+**Convenience: start from current working directory:**
 
 ```rust
 use find_cargo_toml::find_from_current_dir;
@@ -63,26 +71,27 @@ for path in find_from_current_dir(".", None) {
 
 | Function | Description |
 |----------|-------------|
-| `find(input, base, file_name)` | Walk up from `input` (dir or file); resolve relative `input` against `base` (or cwd). Optional `file_name` (default `"Cargo.toml"`). Returns an iterator of manifest paths. |
-| `find_from_current_dir(input, file_name)` | Same as `find(input, None, file_name)`—starts from the current directory. |
+| [`find(input, base, file_name)`](https://docs.rs/find-cargo-toml/*/find_cargo_toml/fn.find.html) | Walk up from `input` (directory or file). Resolve relative `input` against `base` (default: cwd). `file_name` defaults to `"Cargo.toml"`. Returns an iterator of manifest paths (nearest first). |
+| [`find_from_current_dir(input, file_name)`](https://docs.rs/find-cargo-toml/*/find_cargo_toml/fn.find_from_current_dir.html) | Same as `find(input, None, file_name)`. |
 
-- If `input` is a file path, its parent directory is used as the starting directory.
-- Paths are normalized (`.` and `..` are resolved) before walking.
+- If `input` is a file, its parent directory is used as the start.
+- Paths are normalized (`.` and `..` resolved) before walking.
 
-## Contribution
+## Contributing
 
 <details>
-  <summary>Local development</summary>
+<summary>Local development</summary>
 
-- Clone this repository
-- Install the latest version of [Rust](https://rust-lang.org/)
-- Run tests with `cargo test`
+1. Clone the repository.
+2. Install the latest [Rust](https://rust-lang.org/).
+3. Run tests: `cargo test`
+4. Lint: `cargo clippy` · Format: `cargo fmt`
 
 </details>
 
 ## Credits
 
-`find-cargo-toml` is inspired by the npm package [find-package-json](https://www.npmjs.com/package/find-package-json), which finds `package.json` by walking up the directory tree.
+Inspired by [find-package-json](https://www.npmjs.com/package/find-package-json).
 
 ## License
 
