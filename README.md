@@ -1,22 +1,26 @@
 # find-cargo-toml
 
+<!-- automdrs:badges showCrateVersion="true" showCrateDownloads="true" showCrateDocs="true" showCommitActivity="true" showRepoStars="true" -->
 ![Crates.io Version](https://img.shields.io/crates/v/find-cargo-toml)
 ![Crates.io Total Downloads](https://img.shields.io/crates/d/find-cargo-toml)
 ![docs.rs](https://img.shields.io/docsrs/find-cargo-toml)
 ![GitHub commit activity](https://img.shields.io/github/commit-activity/m/betterhyq/find-cargo-toml)
 ![GitHub Repo stars](https://img.shields.io/github/stars/betterhyq/find-cargo-toml)
+<!-- /automdrs -->
 
-`find-cargo-toml` finds `Cargo.toml` (or a custom manifest filename) by walking up the directory tree from a given path—a Rust port of the npm package [find-package-json](https://www.npmjs.com/package/find-package-json).
-
-Use it when you need to locate the nearest Cargo manifest from a subdirectory or file path (e.g. in tools, editors, or build scripts).
+`find-cargo-toml` finds `Cargo.toml` by walking up the directory tree from a given path—a Rust port of the npm package [find-package-json](https://www.npmjs.com/package/find-package-json).
 
 ## Installation
 
 Add this crate with Cargo:
 
-```bash
+<!-- automdrs:cargo-add -->
+
+```sh
 cargo add find-cargo-toml
 ```
+
+<!-- /automdrs -->
 
 ## Usage
 
@@ -82,9 +86,19 @@ for path in find_from_current_dir(".", None) {
 
 ## License
 
+<!-- automdrs:contributors author="YONGQI" license="MIT" -->
 Published under the [MIT](./LICENSE) license.
 Made by [@YONGQI](https://github.com/betterhyq) 💛
 <br><br>
 <a href="https://github.com/betterhyq/find-cargo-toml/graphs/contributors">
 <img src="https://contrib.rocks/image?repo=betterhyq/find-cargo-toml" />
 </a>
+<!-- /automdrs -->
+
+<!-- automdrs:with-automdrs -->
+
+---
+
+_🛠️ auto updated with [automd-rs](https://github.com/betterhyq/automd-rs)_
+
+<!-- /automdrs -->
